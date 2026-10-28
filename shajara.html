@@ -21,10 +21,12 @@ h1{margin:0;font-size:clamp(28px,7vw,46px);letter-spacing:.5px}
 .stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px}
 .stat b{color:var(--acc2);font-size:17px}
+.hint{color:var(--mut);font-size:13px;margin:12px 0 0}
 .wrap{overflow-x:auto;padding:24px 12px 12px;-webkit-overflow-scrolling:touch}
 .tree{width:max-content;margin:0 auto}
 .tree ul{display:flex;justify-content:center;padding:20px 0 0;margin:0;position:relative}
 .tree>ul{padding-top:0}
+.tree ul.hid{display:none}
 .tree li{list-style:none;text-align:center;position:relative;padding:20px 7px 0}
 .tree li::before,.tree li::after{content:'';position:absolute;top:0;right:50%;border-top:2px solid var(--line);width:50%;height:20px}
 .tree li::after{right:auto;left:50%;border-left:2px solid var(--line)}
@@ -35,21 +37,25 @@ h1{margin:0;font-size:clamp(28px,7vw,46px);letter-spacing:.5px}
 .tree li:last-child::before{border-right:2px solid var(--line);border-radius:0 8px 0 0}
 .tree li:first-child::after{border-radius:8px 0 0 0}
 .tree ul ul::before{content:'';position:absolute;top:0;left:50%;border-left:2px solid var(--line);height:20px}
-.node{all:unset;cursor:pointer;display:inline-flex;flex-direction:column;align-items:center;gap:4px;min-width:92px;padding:10px 8px;background:var(--card);
+.node{all:unset;cursor:pointer;display:inline-flex;flex-direction:column;align-items:center;gap:3px;min-width:92px;max-width:112px;padding:10px 8px;background:var(--card);
 border:2px solid var(--line);border-radius:16px;color:var(--ink);font-size:14px;line-height:1.2;box-shadow:0 3px 0 var(--line);transition:transform .2s,box-shadow .2s;
-opacity:0;animation:pop .6s forwards;animation-delay:calc(var(--d)*140ms)}
+opacity:0;animation:pop .5s forwards;animation-delay:calc(var(--d)*120ms)}
 .node:hover,.node:focus-visible{transform:translateY(-4px) rotate(-1deg);box-shadow:0 8px 0 var(--line)}
 .node.sel{border-color:var(--acc2);box-shadow:0 3px 0 var(--acc2)}
 .av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:bold;color:#fff;background:var(--c)}
 .nm{font-weight:bold}
 .gen{font-size:11px;color:var(--mut)}
+.sp{font-size:11px;color:var(--acc2)}
+.node.me{border-color:var(--gold);box-shadow:0 3px 0 var(--gold),0 0 14px var(--gold)}
+.star{font-size:11px;color:var(--gold);font-weight:bold}
+.tog{all:unset;cursor:pointer;display:block;margin:6px auto 0;padding:2px 10px;border-radius:999px;background:var(--acc);color:#fff;font:bold 12px Georgia,serif}
 @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.85)}to{opacity:1;transform:none}}
-.panel{max-width:520px;margin:10px auto 28px;padding:18px;background:var(--card);border:2px dashed var(--line);border-radius:18px;text-align:center}
+.panel{max-width:520px;margin:10px auto 18px;padding:18px;background:var(--card);border:2px dashed var(--line);border-radius:18px;text-align:center}
 .panel h2{margin:0 0 4px}
 .panel p{margin:6px 0;color:var(--mut)}
 .tag{display:inline-block;background:var(--acc);color:#fff;border-radius:999px;padding:2px 12px;font-size:13px}
 footer{text-align:center;color:var(--mut);font-size:13px;padding:0 16px 28px}
-.btn{all:unset;cursor:pointer;margin-top:10px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;font-size:13px;background:var(--card);color:var(--ink)}
+.btn{all:unset;cursor:pointer;margin:4px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;font-size:13px;background:var(--card);color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.node{animation:none;opacity:1}}
 </style>
 </head>
@@ -59,59 +65,103 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:0 16px 28px}
 <h1>🌳 Bizning Shajara</h1>
 <p class="sub">Ildizlardan shoxlargacha — oilamiz tarixi</p>
 <div class="stats"><span class="stat">Avlodlar: <b id="sg">0</b></span><span class="stat">Oila a’zolari: <b id="sp">0</b></span></div>
+<p class="hint">Kartani bosing — ma’lumot chiqadi. Pastdagi ko‘k tugma shoxni ochadi.</p>
 </header>
 <div class="wrap"><div class="tree" id="tree"></div></div>
 <div class="panel" id="panel"></div>
-<footer>Kimnidir bosing — ma’lumot pastda chiqadi.<br><button class="btn" id="theme">🌓 Rejim</button></footer>
+<footer>
+<button class="btn" id="openAll">🌿 Hammasini och</button><button class="btn" id="closeAll">🍂 Yig‘ish</button><button class="btn" id="theme">🌓 Rejim</button>
+</footer>
 <script>
 /* ===== MA’LUMOTLAR — shu yerni o‘zgartirasiz =====
-   id: noyob nom, name: ism, parent: ota/ona id si (ildizda null), note: qisqa ma’lumot */
+   id: noyob nom, name: ism, parent: ota/ona id si (ildizda null),
+   g: 'm' (o‘g‘il) yoki 'f' (qiz) — ixtiyoriy, sp: turmush o‘rtog‘i — ixtiyoriy, note: qo‘shimcha ma’lumot — ixtiyoriy */
 const PEOPLE=[
  {id:'mirrasul',name:'Mirrasul',parent:null,note:'Shajaramizning boshlanishi.'},
- {id:'mirqodir',name:'Mirqodir',parent:'mirrasul',note:'Mirrasulning farzandi.'},
- {id:'baxtiyor',name:'Baxtiyor',parent:'mirqodir',note:'Mirqodirning o‘g‘li.'},
- {id:'botir',name:'Botir',parent:'mirqodir',note:'Mirqodirning o‘g‘li.'},
- {id:'baxodir',name:'Baxodir',parent:'mirqodir',note:'Mirqodirning o‘g‘li.'},
- {id:'b1',name:'Farzand 1',parent:'baxtiyor',note:'Ismini o‘zgartiring.'},
- {id:'b2',name:'Farzand 2',parent:'baxtiyor',note:'Ismini o‘zgartiring.'},
- {id:'t1',name:'Farzand 3',parent:'botir',note:'Ismini o‘zgartiring.'},
- {id:'t2',name:'Farzand 4',parent:'botir',note:'Ismini o‘zgartiring.'},
- {id:'t3',name:'Farzand 5',parent:'botir',note:'Ismini o‘zgartiring.'},
- {id:'d1',name:'Farzand 6',parent:'baxodir',note:'Ismini o‘zgartiring.'},
- {id:'d2',name:'Farzand 7',parent:'baxodir',note:'Ismini o‘zgartiring.'},
- {id:'d3',name:'Farzand 8',parent:'baxodir',note:'Ismini o‘zgartiring.'},
- {id:'d4',name:'Farzand 9',parent:'baxodir',note:'Ismini o‘zgartiring.'}
+ {id:'mirqodir',name:'Mirqodir',parent:'mirrasul'},
+ {id:'baxtiyor',name:'Baxtiyor',parent:'mirqodir',g:'m'},
+ {id:'dilobar',name:'Dilobar',parent:'mirqodir',g:'f'},
+ {id:'baxodir',name:'Baxodir',parent:'mirqodir',g:'m'},
+ {id:'dilorom',name:'Dilorom',parent:'mirqodir',g:'f'},
+ {id:'botir',name:'Botir',parent:'mirqodir',g:'m',sp:'Muxabbat'},
+ {id:'gulchexra',name:'Gulchexra',parent:'mirqodir',g:'f'},
+ {id:'dilfuza',name:'Dilfuza',parent:'mirqodir',g:'f'},
+
+ {id:'shuxrat',name:'Shuxrat',parent:'baxtiyor'},
+ {id:'zoxid',name:'Zoxid',parent:'baxtiyor'},
+ {id:'nargiza',name:'Nargiza',parent:'baxtiyor'},
+ {id:'umida',name:'Umida',parent:'baxtiyor'},
+
+ {id:'dildora',name:'Dildora',parent:'dilobar'},
+ {id:'abdurayim',name:'Abdurayim',parent:'dilobar'},
+ {id:'abdurasul',name:'Abdurasul',parent:'dilobar'},
+
+ {id:'zafar',name:'Zafar',parent:'baxodir'},
+ {id:'begzod',name:'Begzod',parent:'baxodir'},
+ {id:'gozal',name:'Gozal',parent:'baxodir'},
+ {id:'shaxnoza',name:'Shaxnoza',parent:'baxodir'},
+
+ {id:'qobil',name:'Qobil',parent:'dilorom'},
+ {id:'komil',name:'Komil',parent:'dilorom'},
+ {id:'odil',name:'Odil',parent:'dilorom'},
+
+ {id:'feruza',name:'Feruza',parent:'botir',sp:'Kamol'},
+ {id:'baxrom',name:'Baxrom',parent:'botir',sp:'Shaxnoza'},
+ {id:'kamola',name:'Kamola',parent:'botir',sp:'Dilshod'},
+
+ {id:'ubaydulla',name:'Ubaydulla',parent:'gulchexra'},
+ {id:'dilbar',name:'Dilbar',parent:'gulchexra'},
+
+ {id:'dilfuza2',name:'Dilfuza',parent:'feruza'},
+ {id:'farangiz',name:'Farangiz',parent:'feruza'},
+ {id:'azizbek',name:'Azizbek',parent:'feruza'},
+
+ {id:'bexruz',name:'Bexruz',parent:'baxrom',me:true,note:'⭐ Shajara muallifi'},
+ {id:'bexzod',name:'Bexzod',parent:'baxrom'},
+ {id:'abdubosit',name:'Abdubosit',parent:'baxrom'},
+
+ {id:'diyora',name:'Diyora',parent:'kamola'},
+ {id:'axmadjon',name:'Axmadjon',parent:'kamola'}
 ];
 /* ================================================= */
 const COLORS=['#c8553d','#1f7a8c','#8a5a9e','#3f8f4f','#d18a1f'];
 const byId={},kids={};
 PEOPLE.forEach(p=>{byId[p.id]=p;kids[p.id]=[]});
 PEOPLE.forEach(p=>{if(p.parent&&kids[p.parent])kids[p.parent].push(p.id)});
-let maxDepth=0,count=0;
+let maxDepth=0,count=0;const uls=[];
+function descendants(id){return kids[id].reduce((s,k)=>s+1+descendants(k),0)}
 function build(id,depth){
  const p=byId[id];p.depth=depth;maxDepth=Math.max(maxDepth,depth);count++;
  const li=document.createElement('li');
- const b=document.createElement('button');b.className='node';b.style.setProperty('--d',depth+count*0.3);b.dataset.id=id;
- b.innerHTML='<span class="av" style="--c:'+COLORS[depth%COLORS.length]+'"></span><span class="nm"></span><span class="gen"></span>';
- b.querySelector('.av').textContent=p.name.trim()[0]||'?';
+ const b=document.createElement('button');b.className='node';b.style.setProperty('--d',depth);b.dataset.id=id;
+ b.innerHTML='<span class="av"></span><span class="nm"></span><span class="gen"></span><span class="sp"></span><span class="star"></span>';
+ const av=b.querySelector('.av');av.style.setProperty('--c',COLORS[depth%COLORS.length]);av.textContent=p.name.trim()[0]||'?';
  b.querySelector('.nm').textContent=p.name;
  b.querySelector('.gen').textContent=(depth+1)+'-avlod';
+ if(p.sp)b.querySelector('.sp').textContent='💍 '+p.sp;
+ if(p.me){b.classList.add('me');b.querySelector('.star').textContent='⭐ Muallif'}
  b.onclick=()=>show(id);li.appendChild(b);
- if(kids[id].length){const ul=document.createElement('ul');kids[id].forEach(k=>ul.appendChild(build(k,depth+1)));li.appendChild(ul)}
+ if(kids[id].length){
+  const ul=document.createElement('ul');kids[id].forEach(k=>ul.appendChild(build(k,depth+1)));
+  const t=document.createElement('button');t.className='tog';
+  const set=h=>{ul.classList.toggle('hid',h);t.textContent=(h?'▸ ':'▾ ')+kids[id].length};
+  ul.set=set;set(depth>=2);t.onclick=()=>set(!ul.classList.contains('hid'));
+  uls.push(ul);li.appendChild(t);li.appendChild(ul);
+ }
  return li;
 }
-function descendants(id){return kids[id].reduce((s,k)=>s+1+descendants(k),0)}
 function show(id){
  const p=byId[id];
  document.querySelectorAll('.node').forEach(n=>n.classList.toggle('sel',n.dataset.id===id));
- const par=p.parent?byId[p.parent].name:null;
  const el=document.getElementById('panel');el.textContent='';
  const h=document.createElement('h2');h.textContent=p.name;
  const t=document.createElement('span');t.className='tag';t.textContent=(p.depth+1)+'-avlod';
  el.append(h,t);
- const lines=[p.note];
- if(par)lines.push('Ota/ona: '+par);
- lines.push(kids[id].length?'Farzandlari: '+kids[id].map(k=>byId[k].name).join(', '):'Farzandlari hali qo‘shilmagan.');
+ const lines=[];
+ if(p.note)lines.push(p.note);
+ if(p.parent){const par=byId[p.parent].name;lines.push(p.g==='m'?par+'ning o‘g‘li':p.g==='f'?par+'ning qizi':'Ota/ona: '+par)}
+ if(p.sp)lines.push('Turmush o‘rtog‘i: '+p.sp);
+ lines.push(kids[id].length?'Farzandlari: '+kids[id].map(k=>byId[k].name).join(', '):'Farzandlari yo‘q yoki hali qo‘shilmagan.');
  if(descendants(id))lines.push('Jami avlodi: '+descendants(id)+' kishi');
  lines.forEach(l=>{const q=document.createElement('p');q.textContent=l;el.appendChild(q)});
 }
@@ -120,6 +170,8 @@ const ul=document.createElement('ul');ul.appendChild(build(root.id,0));
 document.getElementById('tree').appendChild(ul);
 document.getElementById('sg').textContent=maxDepth+1;
 document.getElementById('sp').textContent=count;
+document.getElementById('openAll').onclick=()=>uls.forEach(u=>u.set(false));
+document.getElementById('closeAll').onclick=()=>uls.forEach(u=>u.set(byId[u.parentNode.firstChild.dataset.id].depth>=2));
 show(root.id);
 document.getElementById('theme').onclick=()=>{
  const r=document.documentElement,dark=getComputedStyle(r).getPropertyValue('--bg').trim()==='#16120e';
