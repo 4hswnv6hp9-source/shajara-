@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shajara — Oila daraxti</title>
+<style>
+:root{--bg:#fbf5e9;--card:#fffdf7;--ink:#2b2118;--mut:#7a6a58;--line:#b98a4a;--acc:#1f7a8c;--acc2:#c8553d;--gold:#e0a82e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16120e;--card:#241d16;--ink:#f3e9d8;--mut:#b4a58f;--line:#a37a3f;--acc:#4fb3c6;--acc2:#ee8066;--gold:#f0c04f}}
+:root[data-theme="dark"]{--bg:#16120e;--card:#241d16;--ink:#f3e9d8;--mut:#b4a58f;--line:#a37a3f;--acc:#4fb3c6;--acc2:#ee8066;--gold:#f0c04f}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif;min-height:100%;
+background-image:radial-gradient(circle at 20% 10%,color-mix(in srgb,var(--gold) 14%,transparent),transparent 40%),radial-gradient(circle at 85% 90%,color-mix(in srgb,var(--acc) 14%,transparent),transparent 40%)}
+header{text-align:center;padding:28px 16px 8px}
+.ornament{height:14px;margin:0 auto 12px;max-width:340px;background:repeating-linear-gradient(90deg,var(--acc2) 0 10px,var(--gold) 10px 20px,var(--acc) 20px 30px);
+-webkit-mask:repeating-linear-gradient(90deg,#000 0 14px,transparent 14px 20px);mask:repeating-linear-gradient(90deg,#000 0 14px,transparent 14px 20px);border-radius:3px}
+h1{margin:0;font-size:clamp(28px,7vw,46px);letter-spacing:.5px}
+.sub{color:var(--mut);margin:6px 0 14px;font-style:italic}
+.stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px}
+.stat b{color:var(--acc2);font-size:17px}
+.wrap{overflow-x:auto;padding:24px 12px 12px;-webkit-overflow-scrolling:touch}
+.tree{width:max-content;margin:0 auto}
+.tree ul{display:flex;justify-content:center;padding:20px 0 0;margin:0;position:relative}
+.tree>ul{padding-top:0}
+.tree li{list-style:none;text-align:center;position:relative;padding:20px 7px 0}
+.tree li::before,.tree li::after{content:'';position:absolute;top:0;right:50%;border-top:2px solid var(--line);width:50%;height:20px}
+.tree li::after{right:auto;left:50%;border-left:2px solid var(--line)}
+.tree li:only-child::before,.tree li:only-child::after{display:none}
+.tree li:only-child{padding-top:0}
+.tree>ul>li{padding-top:0}
+.tree li:first-child::before,.tree li:last-child::after{border:0 none}
+.tree li:last-child::before{border-right:2px solid var(--line);border-radius:0 8px 0 0}
+.tree li:first-child::after{border-radius:8px 0 0 0}
+.tree ul ul::before{content:'';position:absolute;top:0;left:50%;border-left:2px solid var(--line);height:20px}
+.node{all:unset;cursor:pointer;display:inline-flex;flex-direction:column;align-items:center;gap:4px;min-width:92px;padding:10px 8px;background:var(--card);
+border:2px solid var(--line);border-radius:16px;color:var(--ink);font-size:14px;line-height:1.2;box-shadow:0 3px 0 var(--line);transition:transform .2s,box-shadow .2s;
+opacity:0;animation:pop .6s forwards;animation-delay:calc(var(--d)*140ms)}
+.node:hover,.node:focus-visible{transform:translateY(-4px) rotate(-1deg);box-shadow:0 8px 0 var(--line)}
+.node.sel{border-color:var(--acc2);box-shadow:0 3px 0 var(--acc2)}
+.av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:bold;color:#fff;background:var(--c)}
+.nm{font-weight:bold}
+.gen{font-size:11px;color:var(--mut)}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.85)}to{opacity:1;transform:none}}
+.panel{max-width:520px;margin:10px auto 28px;padding:18px;background:var(--card);border:2px dashed var(--line);border-radius:18px;text-align:center}
+.panel h2{margin:0 0 4px}
+.panel p{margin:6px 0;color:var(--mut)}
+.tag{display:inline-block;background:var(--acc);color:#fff;border-radius:999px;padding:2px 12px;font-size:13px}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:0 16px 28px}
+.btn{all:unset;cursor:pointer;margin-top:10px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;font-size:13px;background:var(--card);color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.node{animation:none;opacity:1}}
+</style>
+</head>
+<body>
+<header>
+<div class="ornament"></div>
+<h1>🌳 Bizning Shajara</h1>
+<p class="sub">Ildizlardan shoxlargacha — oilamiz tarixi</p>
+<div class="stats"><span class="stat">Avlodlar: <b id="sg">0</b></span><span class="stat">Oila a’zolari: <b id="sp">0</b></span></div>
+</header>
+<div class="wrap"><div class="tree" id="tree"></div></div>
+<div class="panel" id="panel"></div>
+<footer>Kimnidir bosing — ma’lumot pastda chiqadi.<br><button class="btn" id="theme">🌓 Rejim</button></footer>
+<script>
+/* ===== MA’LUMOTLAR — shu yerni o‘zgartirasiz =====
+   id: noyob nom, name: ism, parent: ota/ona id si (ildizda null), note: qisqa ma’lumot */
+const PEOPLE=[
+ {id:'mirrasul',name:'Mirrasul',parent:null,note:'Shajaramizning boshlanishi.'},
+ {id:'mirqodir',name:'Mirqodir',parent:'mirrasul',note:'Mirrasulning farzandi.'},
+ {id:'baxtiyor',name:'Baxtiyor',parent:'mirqodir',note:'Mirqodirning o‘g‘li.'},
+ {id:'botir',name:'Botir',parent:'mirqodir',note:'Mirqodirning o‘g‘li.'},
+ {id:'baxodir',name:'Baxodir',parent:'mirqodir',note:'Mirqodirning o‘g‘li.'},
+ {id:'b1',name:'Farzand 1',parent:'baxtiyor',note:'Ismini o‘zgartiring.'},
+ {id:'b2',name:'Farzand 2',parent:'baxtiyor',note:'Ismini o‘zgartiring.'},
+ {id:'t1',name:'Farzand 3',parent:'botir',note:'Ismini o‘zgartiring.'},
+ {id:'t2',name:'Farzand 4',parent:'botir',note:'Ismini o‘zgartiring.'},
+ {id:'t3',name:'Farzand 5',parent:'botir',note:'Ismini o‘zgartiring.'},
+ {id:'d1',name:'Farzand 6',parent:'baxodir',note:'Ismini o‘zgartiring.'},
+ {id:'d2',name:'Farzand 7',parent:'baxodir',note:'Ismini o‘zgartiring.'},
+ {id:'d3',name:'Farzand 8',parent:'baxodir',note:'Ismini o‘zgartiring.'},
+ {id:'d4',name:'Farzand 9',parent:'baxodir',note:'Ismini o‘zgartiring.'}
+];
+/* ================================================= */
+const COLORS=['#c8553d','#1f7a8c','#8a5a9e','#3f8f4f','#d18a1f'];
+const byId={},kids={};
+PEOPLE.forEach(p=>{byId[p.id]=p;kids[p.id]=[]});
+PEOPLE.forEach(p=>{if(p.parent&&kids[p.parent])kids[p.parent].push(p.id)});
+let maxDepth=0,count=0;
+function build(id,depth){
+ const p=byId[id];p.depth=depth;maxDepth=Math.max(maxDepth,depth);count++;
+ const li=document.createElement('li');
+ const b=document.createElement('button');b.className='node';b.style.setProperty('--d',depth+count*0.3);b.dataset.id=id;
+ b.innerHTML='<span class="av" style="--c:'+COLORS[depth%COLORS.length]+'"></span><span class="nm"></span><span class="gen"></span>';
+ b.querySelector('.av').textContent=p.name.trim()[0]||'?';
+ b.querySelector('.nm').textContent=p.name;
+ b.querySelector('.gen').textContent=(depth+1)+'-avlod';
+ b.onclick=()=>show(id);li.appendChild(b);
+ if(kids[id].length){const ul=document.createElement('ul');kids[id].forEach(k=>ul.appendChild(build(k,depth+1)));li.appendChild(ul)}
+ return li;
+}
+function descendants(id){return kids[id].reduce((s,k)=>s+1+descendants(k),0)}
+function show(id){
+ const p=byId[id];
+ document.querySelectorAll('.node').forEach(n=>n.classList.toggle('sel',n.dataset.id===id));
+ const par=p.parent?byId[p.parent].name:null;
+ const el=document.getElementById('panel');el.textContent='';
+ const h=document.createElement('h2');h.textContent=p.name;
+ const t=document.createElement('span');t.className='tag';t.textContent=(p.depth+1)+'-avlod';
+ el.append(h,t);
+ const lines=[p.note];
+ if(par)lines.push('Ota/ona: '+par);
+ lines.push(kids[id].length?'Farzandlari: '+kids[id].map(k=>byId[k].name).join(', '):'Farzandlari hali qo‘shilmagan.');
+ if(descendants(id))lines.push('Jami avlodi: '+descendants(id)+' kishi');
+ lines.forEach(l=>{const q=document.createElement('p');q.textContent=l;el.appendChild(q)});
+}
+const root=PEOPLE.find(p=>!p.parent);
+const ul=document.createElement('ul');ul.appendChild(build(root.id,0));
+document.getElementById('tree').appendChild(ul);
+document.getElementById('sg').textContent=maxDepth+1;
+document.getElementById('sp').textContent=count;
+show(root.id);
+document.getElementById('theme').onclick=()=>{
+ const r=document.documentElement,dark=getComputedStyle(r).getPropertyValue('--bg').trim()==='#16120e';
+ r.setAttribute('data-theme',dark?'light':'dark');
+};
+</script>
+</body>
+</html>
