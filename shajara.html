@@ -44,6 +44,9 @@ opacity:0;animation:pop .5s forwards;animation-delay:calc(var(--d)*120ms)}
 .node.sel{border-color:var(--acc2);box-shadow:0 3px 0 var(--acc2)}
 .av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:bold;color:#fff;background:var(--c)}
 .nm{font-weight:bold}
+.fam{font-size:13px}
+.yr{font-size:11px;color:var(--mut)}
+.fam:empty,.yr:empty{display:none}
 .gen{font-size:11px;color:var(--mut)}
 .sp{font-size:11px;color:var(--acc2)}
 .node.me{border-color:var(--gold);box-shadow:0 3px 0 var(--gold),0 0 14px var(--gold)}
@@ -74,54 +77,48 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:0 16px 28px}
 </footer>
 <script>
 /* ===== MA’LUMOTLAR — shu yerni o‘zgartirasiz =====
-   id: noyob nom, name: ism, parent: ota/ona id si (ildizda null),
-   g: 'm' (o‘g‘il) yoki 'f' (qiz) — ixtiyoriy, sp: turmush o‘rtog‘i — ixtiyoriy, note: qo‘shimcha ma’lumot — ixtiyoriy */
+id: noyob nom, name: ism, fam: FAMILIYA, y: TUG‘ILGAN YIL, d: VAFOT YILI (faqat vafot etganlar uchun; yili noma’lum bo‘lsa '?'),
+parent: ota/ona id si (ildizda null),
+g: 'm' (o‘g‘il) yoki 'f' (qiz) — ixtiyoriy, sp: turmush o‘rtog‘i — ixtiyoriy, note: qo‘shimcha ma’lumot — ixtiyoriy
+Familiya va yilni qo‘shtirnoq ichiga yozing. Masalan: fam:'Karimov',y:'1965'
+Bo‘sh qoldirsangiz (fam:'',y:'') kartada ko‘rinmaydi. */
 const PEOPLE=[
- {id:'mirrasul',name:'Mirrasul',parent:null,note:'Shajaramizning boshlanishi.'},
- {id:'mirqodir',name:'Mirqodir',parent:'mirrasul'},
- {id:'baxtiyor',name:'Baxtiyor',parent:'mirqodir',g:'m'},
- {id:'dilobar',name:'Dilobar',parent:'mirqodir',g:'f'},
- {id:'baxodir',name:'Baxodir',parent:'mirqodir',g:'m'},
- {id:'dilorom',name:'Dilorom',parent:'mirqodir',g:'f'},
- {id:'botir',name:'Botir',parent:'mirqodir',g:'m',sp:'Muxabbat'},
- {id:'gulchexra',name:'Gulchexra',parent:'mirqodir',g:'f'},
- {id:'dilfuza',name:'Dilfuza',parent:'mirqodir',g:'f'},
-
- {id:'shuxrat',name:'Shuxrat',parent:'baxtiyor'},
- {id:'zoxid',name:'Zoxid',parent:'baxtiyor'},
- {id:'nargiza',name:'Nargiza',parent:'baxtiyor'},
- {id:'umida',name:'Umida',parent:'baxtiyor'},
-
- {id:'dildora',name:'Dildora',parent:'dilobar'},
- {id:'abdurayim',name:'Abdurayim',parent:'dilobar'},
- {id:'abdurasul',name:'Abdurasul',parent:'dilobar'},
-
- {id:'zafar',name:'Zafar',parent:'baxodir'},
- {id:'begzod',name:'Begzod',parent:'baxodir'},
- {id:'gozal',name:'Gozal',parent:'baxodir'},
- {id:'shaxnoza',name:'Shaxnoza',parent:'baxodir'},
-
- {id:'qobil',name:'Qobil',parent:'dilorom'},
- {id:'komil',name:'Komil',parent:'dilorom'},
- {id:'odil',name:'Odil',parent:'dilorom'},
-
- {id:'feruza',name:'Feruza',parent:'botir',sp:'Kamol'},
- {id:'baxrom',name:'Baxrom',parent:'botir',sp:'Shaxnoza'},
- {id:'kamola',name:'Kamola',parent:'botir',sp:'Dilshod'},
-
- {id:'ubaydulla',name:'Ubaydulla',parent:'gulchexra'},
- {id:'dilbar',name:'Dilbar',parent:'gulchexra'},
-
- {id:'dilfuza2',name:'Dilfuza',parent:'feruza'},
- {id:'farangiz',name:'Farangiz',parent:'feruza'},
- {id:'azizbek',name:'Azizbek',parent:'feruza'},
-
- {id:'bexruz',name:'Bexruz',parent:'baxrom',me:true,note:'⭐ Shajara muallifi'},
- {id:'bexzod',name:'Bexzod',parent:'baxrom'},
- {id:'abdubosit',name:'Abdubosit',parent:'baxrom'},
-
- {id:'diyora',name:'Diyora',parent:'kamola'},
- {id:'axmadjon',name:'Axmadjon',parent:'kamola'}
+{id:'mirrasul',name:'Mirrasul',fam:'',y:'1890',d:'?',parent:null,note:'Shajaramizning boshlanishi.'},
+{id:'mirqodir',name:'Mirqodir',fam:'Rasulov',y:'1920',d:'2012',parent:'mirrasul'},
+{id:'baxtiyor',name:'Baxtiyor',fam:'Rasulov',y:'1949',parent:'mirqodir',g:'m'},
+{id:'dilobar',name:'Dilobar',fam:'',y:'1951',parent:'mirqodir',g:'f'},
+{id:'baxodir',name:'Baxodir',fam:'Rasulov',y:'1953',parent:'mirqodir',g:'m'},
+{id:'dilorom',name:'Dilorom',fam:'',y:'1955',parent:'mirqodir',g:'f'},
+{id:'botir',name:'Botir',fam:'Rasulov',y:'1956',parent:'mirqodir',g:'m',sp:'Muxabbat',spf:'Rasulova',spy:'25.12.1959 – 18.01.1996'},
+{id:'gulchexra',name:'Gulchexra',fam:'',y:'1958',parent:'mirqodir',g:'f'},
+{id:'dilfuza',name:'Dilfuza',fam:'',y:'1960',parent:'mirqodir',g:'f'},
+{id:'shuxrat',name:'Shuxrat',fam:'Rasulov',y:'1975',parent:'baxtiyor'},
+{id:'zoxid',name:'Zoxid',fam:'Rasulov',y:'1983',parent:'baxtiyor'},
+{id:'nargiza',name:'Nargiza',fam:'',y:'1985',parent:'baxtiyor'},
+{id:'umida',name:'Umida',fam:'',y:'1986',parent:'baxtiyor'},
+{id:'dildora',name:'Dildora',fam:'',y:'1979',parent:'dilobar'},
+{id:'abdurayim',name:'Abdurayim',fam:'',y:'1984',parent:'dilobar'},
+{id:'abdurasul',name:'Abdurasul',fam:'',y:'1987',parent:'dilobar'},
+{id:'zafar',name:'Zafar',fam:'Rasulov',y:'1982',parent:'baxodir'},
+{id:'begzod',name:'Begzod',fam:'Rasulov',y:'1985',parent:'baxodir'},
+{id:'gozal',name:'Go‘zal',fam:'',y:'1986',parent:'baxodir'},
+{id:'shaxnoza',name:'Shaxnoza',fam:'',y:'1988',parent:'baxodir'},
+{id:'qobil',name:'Qobil',fam:'',y:'1987',parent:'dilorom'},
+{id:'komil',name:'Komil',fam:'',y:'1988',parent:'dilorom'},
+{id:'odil',name:'Odil',fam:'',y:'1989',parent:'dilorom'},
+{id:'feruza',name:'Feruza',fam:'',y:'1982',parent:'botir',sp:'Kamol'},
+{id:'baxrom',name:'Baxrom',fam:'Rasulov',y:'1984',parent:'botir',sp:'Shaxnoza'},
+{id:'kamola',name:'Kamola',fam:'Rasulova',y:'1992',parent:'botir',sp:'Dilshod'},
+{id:'ubaydulla',name:'Ubaydulla',fam:'',y:'1990',parent:'gulchexra'},
+{id:'dilbar',name:'Dilbar',fam:'',y:'1993',parent:'gulchexra'},
+{id:'dilfuza2',name:'Dilfuza',fam:'',y:'2002',parent:'feruza'},
+{id:'farangiz',name:'Farangiz',fam:'',y:'2004',parent:'feruza'},
+{id:'azizbek',name:'Azizbek',fam:'',y:'2007',parent:'feruza'},
+{id:'bexruz',name:'Bexruz',fam:'Botirov',y:'2008',parent:'baxrom',me:true,note:'⭐ Shajara muallifi'},
+{id:'bexzod',name:'Bexzod',fam:'Botirov',y:'2009',parent:'baxrom'},
+{id:'abdubosit',name:'Abdubosit',fam:'Botirov',y:'2015',parent:'baxrom'},
+{id:'diyora',name:'Diyora',fam:'Rasulova',y:'2014',parent:'kamola'},
+{id:'axmadjon',name:'Axmadjon',fam:'Rasulov',y:'2019',parent:'kamola'}
 ];
 /* ================================================= */
 const COLORS=['#c8553d','#1f7a8c','#8a5a9e','#3f8f4f','#d18a1f'];
@@ -131,39 +128,44 @@ PEOPLE.forEach(p=>{if(p.parent&&kids[p.parent])kids[p.parent].push(p.id)});
 let maxDepth=0,count=0;const uls=[];
 function descendants(id){return kids[id].reduce((s,k)=>s+1+descendants(k),0)}
 function build(id,depth){
- const p=byId[id];p.depth=depth;maxDepth=Math.max(maxDepth,depth);count++;
- const li=document.createElement('li');
- const b=document.createElement('button');b.className='node';b.style.setProperty('--d',depth);b.dataset.id=id;
- b.innerHTML='<span class="av"></span><span class="nm"></span><span class="gen"></span><span class="sp"></span><span class="star"></span>';
- const av=b.querySelector('.av');av.style.setProperty('--c',COLORS[depth%COLORS.length]);av.textContent=p.name.trim()[0]||'?';
- b.querySelector('.nm').textContent=p.name;
- b.querySelector('.gen').textContent=(depth+1)+'-avlod';
- if(p.sp)b.querySelector('.sp').textContent='💍 '+p.sp;
- if(p.me){b.classList.add('me');b.querySelector('.star').textContent='⭐ Muallif'}
- b.onclick=()=>show(id);li.appendChild(b);
- if(kids[id].length){
-  const ul=document.createElement('ul');kids[id].forEach(k=>ul.appendChild(build(k,depth+1)));
-  const t=document.createElement('button');t.className='tog';
-  const set=h=>{ul.classList.toggle('hid',h);t.textContent=(h?'▸ ':'▾ ')+kids[id].length};
-  ul.set=set;set(depth>=2);t.onclick=()=>set(!ul.classList.contains('hid'));
-  uls.push(ul);li.appendChild(t);li.appendChild(ul);
- }
- return li;
+const p=byId[id];p.depth=depth;maxDepth=Math.max(maxDepth,depth);count++;
+const li=document.createElement('li');
+const b=document.createElement('button');b.className='node';b.style.setProperty('--d',depth);b.dataset.id=id;
+b.innerHTML='<span class="av"></span><span class="nm"></span><span class="fam"></span><span class="yr"></span><span class="gen"></span><span class="sp"></span><span class="star"></span>';
+const av=b.querySelector('.av');av.style.setProperty('--c',COLORS[depth%COLORS.length]);av.textContent=p.name.trim()[0]||'?';
+b.querySelector('.nm').textContent=p.name;
+b.querySelector('.fam').textContent=p.fam||'';
+const dead=p.d!==undefined&&p.d!=='';
+b.querySelector('.yr').textContent=p.y?(dead?'🕊️ '+p.y+'–'+p.d:'🎂 '+p.y):'';
+b.querySelector('.gen').textContent=(depth+1)+'-avlod';
+if(p.sp)b.querySelector('.sp').textContent='💍 '+p.sp;
+if(p.me){b.classList.add('me');b.querySelector('.star').textContent='⭐ Muallif'}
+b.onclick=()=>show(id);li.appendChild(b);
+if(kids[id].length){
+const ul=document.createElement('ul');kids[id].forEach(k=>ul.appendChild(build(k,depth+1)));
+const t=document.createElement('button');t.className='tog';
+const set=h=>{ul.classList.toggle('hid',h);t.textContent=(h?'▸ ':'▾ ')+kids[id].length};
+ul.set=set;set(depth>=2);t.onclick=()=>set(!ul.classList.contains('hid'));
+uls.push(ul);li.appendChild(t);li.appendChild(ul);
+}
+return li;
 }
 function show(id){
- const p=byId[id];
- document.querySelectorAll('.node').forEach(n=>n.classList.toggle('sel',n.dataset.id===id));
- const el=document.getElementById('panel');el.textContent='';
- const h=document.createElement('h2');h.textContent=p.name;
- const t=document.createElement('span');t.className='tag';t.textContent=(p.depth+1)+'-avlod';
- el.append(h,t);
- const lines=[];
- if(p.note)lines.push(p.note);
- if(p.parent){const par=byId[p.parent].name;lines.push(p.g==='m'?par+'ning o‘g‘li':p.g==='f'?par+'ning qizi':'Ota/ona: '+par)}
- if(p.sp)lines.push('Turmush o‘rtog‘i: '+p.sp);
- lines.push(kids[id].length?'Farzandlari: '+kids[id].map(k=>byId[k].name).join(', '):'Farzandlari yo‘q yoki hali qo‘shilmagan.');
- if(descendants(id))lines.push('Jami avlodi: '+descendants(id)+' kishi');
- lines.forEach(l=>{const q=document.createElement('p');q.textContent=l;el.appendChild(q)});
+const p=byId[id];
+document.querySelectorAll('.node').forEach(n=>n.classList.toggle('sel',n.dataset.id===id));
+const el=document.getElementById('panel');el.textContent='';
+const h=document.createElement('h2');h.textContent=p.fam?p.name+' '+p.fam:p.name;
+const t=document.createElement('span');t.className='tag';t.textContent=(p.depth+1)+'-avlod';
+el.append(h,t);
+const lines=[];
+if(p.y)lines.push('Tug‘ilgan yili: '+p.y);
+if(p.d!==undefined&&p.d!=='')lines.push('Vafot etgan yili: '+(p.d==='?'?'noma’lum':p.d));
+if(p.note)lines.push(p.note);
+if(p.parent){const par=byId[p.parent].name;lines.push(p.g==='m'?par+'ning o‘g‘li':p.g==='f'?par+'ning qizi':'Ota/ona: '+par)}
+if(p.sp)lines.push('Turmush o‘rtog‘i: '+p.sp+(p.spf?' '+p.spf:'')+(p.spy?' ('+p.spy+')':''));
+lines.push(kids[id].length?'Farzandlari: '+kids[id].map(k=>byId[k].name).join(', '):'Farzandlari yo‘q yoki hali qo‘shilmagan.');
+if(descendants(id))lines.push('Jami avlodi: '+descendants(id)+' kishi');
+lines.forEach(l=>{const q=document.createElement('p');q.textContent=l;el.appendChild(q)});
 }
 const root=PEOPLE.find(p=>!p.parent);
 const ul=document.createElement('ul');ul.appendChild(build(root.id,0));
@@ -174,8 +176,8 @@ document.getElementById('openAll').onclick=()=>uls.forEach(u=>u.set(false));
 document.getElementById('closeAll').onclick=()=>uls.forEach(u=>u.set(byId[u.parentNode.firstChild.dataset.id].depth>=2));
 show(root.id);
 document.getElementById('theme').onclick=()=>{
- const r=document.documentElement,dark=getComputedStyle(r).getPropertyValue('--bg').trim()==='#16120e';
- r.setAttribute('data-theme',dark?'light':'dark');
+const r=document.documentElement,dark=getComputedStyle(r).getPropertyValue('--bg').trim()==='#16120e';
+r.setAttribute('data-theme',dark?'light':'dark');
 };
 </script>
 </body>
